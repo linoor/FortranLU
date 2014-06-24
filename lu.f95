@@ -10,6 +10,8 @@ program lu_decomposition
 	call decompose(L, U, A)
 
 	call print_matrix(L)
+	call print_matrix(U)
+	call print_matrix(A)
 
 	contains
 
@@ -46,9 +48,11 @@ program lu_decomposition
 		n = 3
 		do i=1, m
 		    do j=1, n
-		        write (*,*) matrix(i,j)
+		        write (*,"(f8.3)", advance="no") matrix(i,j)
 		    enddo
+		    print *
 		enddo
+		print *
 
 	end subroutine print_matrix
 
