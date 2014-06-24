@@ -4,21 +4,24 @@ program lu_decomposition
 
 	integer, parameter :: n = 3 !size of the matrix
 
-	real, dimension(n,n) :: L, U, A
-	L = reshape((/real::5,1,3,3,2,0,2,0,4/), (/n,n/))
+	real(kind=16), dimension(n,n) :: L, U, A
+	A = reshape((/real::5,1,3,3,2,0,2,0,4/), (/n,n/))
 
 	call decompose(L, U, A)
 
-	call print_matrix(L)
-	call print_matrix(U)
+	print *, "matrix A:"
 	call print_matrix(A)
+	print *, "matrix L:"
+	call print_matrix(L)
+	print *, "matrix U:"
+	call print_matrix(U)
 
 	contains
 
 	subroutine decompose(L, U, A)
 
 		implicit none
-		real, dimension(n,n) :: L, U, A
+		real(kind=16), dimension(n,n) :: L, U, A
 		integer i,j,k
 
 		do i=1, n
@@ -42,13 +45,13 @@ program lu_decomposition
 	subroutine print_matrix(matrix)
 
 		implicit none
-		real, dimension(n,n) :: matrix
+		real(kind=16), dimension(n,n) :: matrix
 		integer i,j, n, m
 		m = 3
 		n = 3
 		do i=1, m
 		    do j=1, n
-		        write (*,"(f8.3)", advance="no") matrix(i,j)
+		        write (*,"(dc,f12.3)", advance="no") matrix(i,j)
 		    enddo
 		    print *
 		enddo
