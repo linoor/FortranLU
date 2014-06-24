@@ -25,6 +25,10 @@ program lu_decomposition
 		integer i,j,k
 
 		do i=1, n
+			l(i,i) = 1
+		enddo
+
+		do i=1, n
 			do j=i, n
 				u(i,j) = a(i,j)
 				do k=1, i-1
