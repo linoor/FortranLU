@@ -1,75 +1,56 @@
-program lu1
-implicit none
- 
-real*8     :: a1(3,3), a2(4,4)
- 
-a1 = reshape((/real*8::1,2,1,3,4,1,5,7,0/),(/3,3/))
-call check(a1)
- 
-a2 = reshape((/real*8::11,1,3,2,9,5,17,5,24,2,18,7,2,6,1,1/),(/4,4/))
-call check(a2)
- 
-contains
- 
-subroutine lu(a,p)
-! in situ decomposition, correspondes to LAPACK's dgebtrf
-implicit none
-real*8, intent(inout) :: a(:,:)
-integer, intent(out)  :: p(:)
-integer               :: n, i,j,k,ii
-n = ubound(a,1)
-p = (/ ( i, i=1,n ) /)
-do k = 1,n-1
-    ii = k-1+maxloc(abs(a(p(k:),k)),1)
-    if (ii /= k )  then
-        p((/k, ii/)) = p((/ii, k/))
-    end if
-    a(p(k+1:),k) = a(p(k+1:),k)/a(p(k),k) 
-    forall (j = k+1:n)
-        a(p(k+1:),j) = a(p(k+1:),j)-a(p(k+1:),k)*a(p(k),j)
-    end forall
-end do
-end subroutine
- 
-subroutine check(a)
-implicit none
-real*8, intent(in) :: a(:,:)
-real*8             :: aa(ubound(a,1), ubound(a,2))
-real*8             :: l(ubound(a,1), ubound(a,2)) 
-real*8             :: u(ubound(a,1), ubound(a,2)) 
-integer            :: p(ubound(a,1), ubound(a,2)), ipiv(ubound(a,1))
-integer            :: i,  n
-character(len=100) :: fmt 
- 
-n = ubound(a,1)
-aa = a ! work with a copy
-p = 0; l=0; u = 0
-forall (i=1:n)
-    p(i,i) = 1d0; l(i,i) = 1d0 ! convert permutation vector a matrix
-end forall
- 
-call lu(aa, ipiv)
-do i = 1,n
-   l(i,:i-1) = aa(ipiv(i),:i-1)
-   u(i,i:) = aa(ipiv(i),i:)
-end do
-p(ipiv,:) = p
-write (fmt,"(a,i1,a)") "(",n,"(f8.2,1x))"
- 
-print *, "a"
-print fmt, transpose(a)
- 
-print *, "p"
-print fmt, transpose(dble(p))
- 
-print *, "l"
-print fmt, transpose(l)
- 
-print *, "u"
-print fmt, transpose(u)
- 
-print *, "residual"
-print *, "|| P.A - L.U || =  ", maxval(abs(matmul(p,a)-matmul(l,u)))
- 
-end subroutine
-end program
+program lu_decomposition
+
+	implicit none
+
+	integer, parameter :: n = 3 !size of the matrix
+
+	real, dimension(n,n) :: L, U, A
+	L = reshape((/real::5,1,3,3,2,0,2,0,4/), (/n,n/))
+
+	call decompose(L, U, A)
+
+	call print_matrix(L)
+
+	contains
+
+	subroutine decompose(L, U, A)
+
+		implicit none
+		real, dimension(n,n) :: L, U, A
+		integer i,j,k
+
+		do i=1, n
+			do j=i, n
+				u(i,j) = a(i,j)
+				do k=1, i-1
+					u(i,j) = u(i,j) - l(i,k) * u(k,j)
+				enddo
+			enddo
+			do j=i+1, n
+				l(j,i) = a(j,i)
+				do k=1, i-1
+					l(j,i) = l(j,i) - l(j,k) * u(k,i)
+				enddo
+				l(j,i) = l(j,i) / u(i,i)
+			enddo
+		enddo
+
+	end subroutine decompose
+
+	subroutine print_matrix(matrix)
+
+		implicit none
+		real, dimension(n,n) :: matrix
+		integer i,j, n, m
+		m = 3
+		n = 3
+		do i=1, m
+		    do j=1, n
+		        write (*,*) matrix(i,j)
+		    enddo
+		enddo
+
+	end subroutine print_matrix
+
+end program lu_decomposition
+
